@@ -5,6 +5,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import logging
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Load environment variables
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
@@ -17,7 +21,10 @@ MEMORY_THRESHOLD = float(os.getenv("MEMORY_THRESHOLD", 90))
 DISK_THRESHOLD = float(os.getenv("DISK_THRESHOLD", 90))
 
 # Configure logging
-LOG_FILE = os.getenv("LOG_FILE", "/home/pi/monitoring.log")
+DIRECTORY = os.getenv("DIRECTORY")
+
+LOG_FILE="{}/{}".format(DIRECTORY, "monitoring.log")
+
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Function to get CPU temperature

@@ -183,6 +183,31 @@ You should see entries about the system's temperature, CPU usage, memory usage, 
 
 ---
 
+## Logrotation
+
+```bash
+sudo apt install logrotate -y
+
+sudo nano /etc/logrotate.d/pi-monitoring
+
+```
+
+```ini
+/home/pi/pi-monitoring/monitoring.log {
+    daily                # Rotate logs daily
+    rotate 7             # Keep 7 days of logs
+    compress             # Compress old log files
+    missingok            # Don't throw an error if the log file is missing
+    notifempty           # Don't rotate if the log file is empty
+    create 0644 pi pi    # Create a new log file with the specified permissions after rotation
+    size 10M             # Rotate the log file when it reaches 10MB
+    dateext              # Add a date extension to rotated files (e.g. monitoring.log-2023-02-15.gz)
+    maxage 7             # Delete rotated log files older than 7 days
+}
+```
+
+---
+
 ## Troubleshooting
 
 - If the emails aren't sending, ensure that your email credentials are correct and that your SMTP server settings match your email provider's configuration.

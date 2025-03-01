@@ -30,7 +30,8 @@ To install Git, Python 3, and the necessary Python libraries:
 ```bash
 sudo apt update
 sudo apt install python3-pip git
-pip3 install psutil
+apt install python3-psuti
+apt install python3-dotenv
 ```
 
 ---

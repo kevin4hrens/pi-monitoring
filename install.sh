@@ -8,6 +8,7 @@ HOME_DIR="/home/$CURRENT_USER"
 MONITORING_DIR="$HOME_DIR/pi-monitoring"
 LOGROTATE_CONF="/etc/logrotate.d/pi-monitoring"
 ENV_FILE="$MONITORING_DIR/.env"
+ENV_DIST_FILE="$MONITORING_DIR/.env.dist"
 
 # Step 1: Install required packages
 echo "[+] Installing required packages..."
@@ -21,7 +22,16 @@ if [ ! -d "$MONITORING_DIR" ]; then
     exit 1
 fi
 
-# Step 3: Update .env file with correct DIRECTORY path
+# Step 3: Copy .env.dist to .env
+echo "[+] Copying .env.dist to .env..."
+if [ -f "$ENV_DIST_FILE" ]; then
+    cp "$ENV_DIST_FILE" "$ENV_FILE"
+else
+    echo "[!] .env.dist file not found! Please ensure the file is present in $MONITORING_DIR."
+    exit 1
+fi
+
+# Step 4: Update .env file with correct directory path
 echo "[+] Updating .env file with correct directory path..."
 sed -i "s|^DIRECTORY=.*|DIRECTORY=$MONITORING_DIR|" "$ENV_FILE"
 
@@ -30,15 +40,15 @@ echo "nano $ENV_FILE"
 echo "[!] Press SPACE when you're done to continue."
 read -n 1 -s -r -p ""
 
-# Step 4: Set up monitoring script
+# Step 5: Set up monitoring script
 echo "cd $MONITORING_DIR && /usr/bin/python3 monitor.py" > "$MONITORING_DIR/monitoring.sh"
 chmod +x "$MONITORING_DIR/monitoring.sh"
 
-# Step 5: Add cronjob
+# Step 6: Add cronjob
 echo "[+] Adding cronjob..."
 (crontab -l 2>/dev/null; echo "*/5 * * * * $MONITORING_DIR/monitoring.sh") | crontab -
 
-# Step 6: Configure logrotate
+# Step 7: Configure logrotate
 echo "[+] Setting up logrotate..."
 sudo bash -c "cat > $LOGROTATE_CONF" <<EOL
 $MONITORING_DIR/monitoring.log {

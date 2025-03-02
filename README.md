@@ -200,7 +200,6 @@ sudo nano /etc/logrotate.d/pi-monitoring
     compress             # Compress old log files
     missingok            # Don't throw an error if the log file is missing
     notifempty           # Don't rotate if the log file is empty
-    create 0644 pi pi    # Create a new log file with the specified permissions after rotation
     size 10M             # Rotate the log file when it reaches 10MB
     dateext              # Add a date extension to rotated files (e.g. monitoring.log-2023-02-15.gz)
     maxage 7             # Delete rotated log files older than 7 days

@@ -23,9 +23,15 @@ DISK_THRESHOLD = float(os.getenv("DISK_THRESHOLD", 90))
 # Configure logging
 DIRECTORY = os.getenv("DIRECTORY")
 
-LOG_FILE="{}/{}".format(DIRECTORY, "monitoring.log")
+LOG_FILE = os.path.join(DIRECTORY, "logs", "monitoring.log")
+os.makedirs(LOG_DIR, exist_ok=True)
 
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(module)s.%(funcName)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 # Function to get CPU temperature
 def get_cpu_temp():

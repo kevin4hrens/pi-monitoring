@@ -11,16 +11,17 @@ ENV_FILE="$MONITORING_DIR/.env"
 
 # Step 1: Install required packages
 echo "[+] Installing required packages..."
-sudo apt update && sudo apt install -y python3-pip git python3-psutil python3-dotenv logrotate
+sudo apt update -qq || { echo "[!] Failed to update package lists"; exit 1; }
+sudo apt install -y python3-pip git python3-psutil python3-dotenv logrotate >/dev/null 2>&1 || { echo "[!] Failed to install required packages"; exit 1; }
 
-# Step 2: Clone and install pi-monitoring
-echo "[+] Cloning pi-monitoring repository..."
-git clone https://github.com/kevin4hrens/pi-monitoring.git "$MONITORING_DIR"
-cd "$MONITORING_DIR"
+# Step 2: Ensure the directory exists
+echo "[+] Ensuring pi-monitoring directory exists..."
+if [ ! -d "$MONITORING_DIR" ]; then
+    echo "[!] Directory $MONITORING_DIR does not exist! Please clone the repository manually before running this script."
+    exit 1
+fi
 
-mv .env.dist .env
-
-# Update .env file with correct DIRECTORY path
+# Step 3: Update .env file with correct DIRECTORY path
 echo "[+] Updating .env file with correct directory path..."
 sed -i "s|^DIRECTORY=.*|DIRECTORY=$MONITORING_DIR|" "$ENV_FILE"
 
@@ -29,15 +30,15 @@ echo "nano $ENV_FILE"
 echo "[!] Press SPACE when you're done to continue."
 read -n 1 -s -r -p ""
 
-# Step 3: Set up monitoring script
+# Step 4: Set up monitoring script
 echo "cd $MONITORING_DIR && /usr/bin/python3 monitor.py" > "$MONITORING_DIR/monitoring.sh"
 chmod +x "$MONITORING_DIR/monitoring.sh"
 
-# Step 4: Add cronjob
+# Step 5: Add cronjob
 echo "[+] Adding cronjob..."
 (crontab -l 2>/dev/null; echo "*/5 * * * * $MONITORING_DIR/monitoring.sh") | crontab -
 
-# Step 5: Configure logrotate
+# Step 6: Configure logrotate
 echo "[+] Setting up logrotate..."
 sudo bash -c "cat > $LOGROTATE_CONF" <<EOL
 $MONITORING_DIR/monitoring.log {
@@ -46,7 +47,6 @@ $MONITORING_DIR/monitoring.log {
     compress
     missingok
     notifempty
-    create 0644 pi pi
     size 10M
     dateext
     maxage 7
